@@ -11,4 +11,9 @@ require 'json'
 secret = Chef::EncryptedDataBagItem.load_secret ARGV.first
 data = JSON.load STDIN.read
 encrypted_data = Chef::EncryptedDataBagItem.encrypt_data_bag_item(data, secret)
-STDOUT.write encrypted_data.to_json
+if ARGV.last == 'decrypt'
+  output = encrypted_data.to_json
+else
+  output = JSON.pretty_generate(encrypted_data)
+end
+STDOUT.write output

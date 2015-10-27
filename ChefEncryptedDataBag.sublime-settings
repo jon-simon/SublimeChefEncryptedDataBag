@@ -3,4 +3,6 @@
   // "ruby": "/Users/you/.anyenv/envs/rbenv/shims/ruby",
   // Path to encrypted data bag secret
   // "encrypted_databag_secret": "/Users/you/.chef/encrypted_data_bag_secret"
+  // Enable pretty json output, options: decrypt, encrypt, both
+  "pretty_json": "decrypt"
 }

@@ -34,9 +34,10 @@ class ProcessDataBagItemMixin(object):
     def run_script(self, script_name, data, secret_file):
         settings = sublime.load_settings("ChefEncryptedDataBag.sublime-settings")
         ruby = settings.get("ruby", "ruby")
+        pretty_json = settings.get("pretty_json", "pretty_json")
 
         script_path = os.path.join(PLUGIN_DIR, script_name)
-        cmd = [ruby, "--encoding", "utf-8", script_path, secret_file]
+        cmd = [ruby, "--encoding", "utf-8", script_path, secret_file, pretty_json]
 
         proc = subprocess.Popen(cmd, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         stdout, stderr = proc.communicate(data.encode("utf_8"))
