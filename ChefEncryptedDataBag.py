@@ -31,14 +31,20 @@ class ProcessDataBagItemMixin(object):
     def process(self, data, secret_file):
         raise "Please override #process"
 
-    def run_script(self, script_name, data, secret_file):
+    def run_script(self, subcommand, data, secret_file):
+        # Read settings
         settings = sublime.load_settings("ChefEncryptedDataBag.sublime-settings")
         ruby = settings.get("ruby", "ruby")
-        pretty_json = settings.get("pretty_json", "pretty_json")
+        pretty_json = settings.get("pretty_json", "decrypt")
+        pretty_print = pretty_json == subcommand or pretty_json == "both"
 
-        script_path = os.path.join(PLUGIN_DIR, script_name)
-        cmd = [ruby, "--encoding", "utf-8", script_path, secret_file, pretty_json]
+        # Build command
+        script_path = os.path.join(PLUGIN_DIR, "chef_process_databag_item.rb")
+        cmd = [ruby, "--encoding", "utf-8", script_path, subcommand, "--secret-file", secret_file]
+        if pretty_print:
+            cmd.append("--pretty-print")
 
+        # Invoke script
         proc = subprocess.Popen(cmd, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         stdout, stderr = proc.communicate(data.encode("utf_8"))
 
@@ -50,8 +56,8 @@ class ProcessDataBagItemMixin(object):
 
 class EncryptDataBagItemCommand(ProcessDataBagItemMixin, sublime_plugin.TextCommand):
     def process(self, data, secret_file):
-        return self.run_script("chef_encrypt_databag_item.rb", data, secret_file)
+        return self.run_script("encrypt", data, secret_file)
 
 class DecryptDataBagItemCommand(ProcessDataBagItemMixin, sublime_plugin.TextCommand):
     def process(self, data, secret_file):
-        return self.run_script("chef_decrypt_databag_item.rb", data, secret_file)
+        return self.run_script("decrypt", data, secret_file)
