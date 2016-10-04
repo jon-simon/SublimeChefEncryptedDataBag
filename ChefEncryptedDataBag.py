@@ -11,14 +11,14 @@ class ProcessDataBagItemMixin(object):
             return str(s, "utf_8")
 
     def run(self, edit):
-        repository_root = self.view.window().folders()[0]
-        secret_file = os.path.join(repository_root, "data_bag_key")
+        self.repository_root = self.view.window().folders()[0]
+        secret_file = os.path.join(self.repository_root, "data_bag_key")
 
         # Read data_bag_key
         if not os.path.exists(secret_file):
           settings = sublime.load_settings("ChefEncryptedDataBag.sublime-settings")
           secret_file_setting = settings.get("encrypted_databag_secret", "encrypted_databag_secret")
-          secret_file = os.path.join(repository_root, secret_file_setting)
+          secret_file = os.path.join(self.repository_root, secret_file_setting)
 
         # Get content
         region_all = sublime.Region(0, self.view.size())
@@ -45,7 +45,7 @@ class ProcessDataBagItemMixin(object):
             cmd.append("--pretty-print")
 
         # Invoke script
-        proc = subprocess.Popen(cmd, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+        proc = subprocess.Popen(cmd, cwd = self.repository_root, stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         stdout, stderr = proc.communicate(data.encode("utf_8"))
 
         returncode = proc.wait()

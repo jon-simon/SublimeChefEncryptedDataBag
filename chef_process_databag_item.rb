@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
 # Usage: ruby chef_process_databag_item.rb --secret-file=data_bag_key --pretty-print encrypt < foo.json
 
+# load Gemfile.lock to load 'chef' gem faster
+if File.exists?("Gemfile.lock")
+  begin
+    require "bundler/setup"
+  rescue LoadError
+  end
+end
+
 begin
   require "chef/encrypted_data_bag_item"
 rescue LoadError
